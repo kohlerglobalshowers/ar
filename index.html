@@ -1,10 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-   <head>
-      <title>HTML Meta Tag</title>
-      <meta http-equiv = "refresh" content = "0; url =http://hugeinc.com/" />
-   </head>
-   <body>
-      <p>Redirecting..</p>
-   </body>
+
+<head>
+  <title>Studio Kohler - Virtual Experience</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="//geoip-js.com/js/apis/geoip2/v2.1/geoip2.js"></script>
+  <script>
+    var redirect = (function() {
+      /* This implements the actual redirection. */
+      var redirectBrowser = function(site) {
+        var uri = "" + site;
+        window.location = uri;
+      };
+
+
+      var defaultSite = "https://www.us.kohler.com/us/";
+      var chineseSite = "https://www.kohler.com.cn/";
+
+      var onSuccess = function(geoipResponse) {
+        /* There's no guarantee that a successful response object
+         * has any particular property, so we need to code defensively. */
+        if (!geoipResponse.country.iso_code) {
+          console.log("Redirecting to Global site");
+          redirectBrowser(defaultSite);
+          return;
+        }
+
+        /* ISO country codes are in upper case. */
+        var code = geoipResponse.country.iso_code.toLowerCase();
+        console.log(code);
+        if (code === 'cn') {
+          console.log("Redirecting to Chinese site");
+          redirectBrowser(chineseSite);
+        } else {
+          console.log("Redirecting to Global site");
+          redirectBrowser(defaultSite);
+        }
+      };
+
+      /* We don't really care what the error is, we'll send them
+       * to the default site. */
+      var onError = function(error) {
+        console.log("Redirecting to Global site");
+        redirectBrowser(defaultSite);
+      };
+
+      return function() {
+        geoip2.country(onSuccess, onError);
+      };
+    }());
+
+    redirect();
+  </script>
+</head>
+
+<body>
+  <p>Redirecting...</p>
+</body>
+
 </html>
